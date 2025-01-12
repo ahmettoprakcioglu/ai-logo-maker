@@ -11,4 +11,10 @@ const compat = new FlatCompat({
 
 const eslintConfig = [...compat.extends("next/core-web-vitals")];
 
+eslintConfig.push({
+  rules: {
+    "indent": ["error", 2],
+  },
+});
+
 export default eslintConfig;
