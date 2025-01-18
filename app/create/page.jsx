@@ -8,6 +8,7 @@ import LogoDesc from './_components/LogoDesc';
 import LogoColorPalette from './_components/LogoColorPalette';
 import LogoIdea from './_components/LogoIdea';
 import LogoDesigns from './_components/LogoDesigns';
+import PricingModel from './_components/PricingModel';
 
 const CreateLogo = () => {
   const [step, setStep] = useState(1);
@@ -33,6 +34,8 @@ const CreateLogo = () => {
         <LogoDesigns onHandleInputChange={val => onHandleInputChange('design', val)} formData={formData} />
       ) : step === 5 ? (
         <LogoIdea onHandleInputChange={val => onHandleInputChange('idea', val)} formData={formData} />
+      ) : step === 6 ? (
+        <PricingModel onHandleInputChange={val => onHandleInputChange('pricing', val)} formData={formData} />
       ) : null}
       <div className='flex items-center justify-between'>
         {step !== 1 && (

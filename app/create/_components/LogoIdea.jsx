@@ -7,18 +7,17 @@ import { useLogoContext } from '@/app/_context/LogoContext'
 function LogoIdea({ formData, onHandleInputChange }) {
   const { logoIdeas, updateLogoIdeas, fetchLogoIdeas, loading } = useLogoContext();
   const [selectedOption, setSelectedOption] = useState(formData?.idea);
+  const isInitialMount = useRef(true);
 
   useEffect(() => {
-    const controller = new AbortController();
-    
-    if (!formData?.idea) {
-      fetchLogoIdeas(formData);
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      
+      if (!formData?.idea && formData?.design) {
+        fetchLogoIdeas(formData);
+      }
     }
-
-    return () => {
-      controller.abort();
-    };
-  }, [logoIdeas, formData, updateLogoIdeas]);
+  }, [formData?.idea, formData?.design]);
 
   return (
     <div className='my-10'>
