@@ -1,9 +1,82 @@
-import React from 'react'
+import React, { useEffect, useState, useRef } from 'react'
+import HeadingDescription from './HeadingDescription'
+import Lookup from '@/app/_data/Lookup'
+import axios from 'axios'
+import Prompt from '../../_data/Prompt'
+import { Loader2Icon } from 'lucide-react'
 
-const LogoIdea = () => {
+function LogoIdea({ formData, onHandleInputChange }) {
+  const [ideas, setIdeas] = useState();
+  const [loading, setLoading] = useState(false);
+  const [selectedOption, setSelectedOption] = useState(formData?.idea);
+  const requestInProgress = useRef(false);
+
+  useEffect(() => {
+    const controller = new AbortController();
+
+    const fetchIdeas = async () => {
+      if (!ideas && !requestInProgress.current) {
+        try {
+          requestInProgress.current = true;
+          setLoading(true);
+          
+          const PROMPT = Prompt.DESIGN_IDEA_PROMPT
+            .replace('{logoType}', formData?.design?.title || '')
+            .replace('{logoTitle}', formData?.title || '')
+            .replace('{logoDesc}', formData?.desc || '')
+            .replace('{logoPrompt}', formData?.design?.prompt || '');
+
+          const result = await axios.post('/api/ai-design-ideas', 
+            { prompt: PROMPT }
+          );
+
+          if (result?.data?.logo_ideas) {
+            setIdeas(result?.data?.logo_ideas);
+          }
+        } catch (error) {
+          if (!axios.isCancel(error)) {
+            console.error('Error generating logo ideas:', error);
+          }
+        } finally {
+          setLoading(false);
+          requestInProgress.current = false;
+        }
+      }
+    };
+
+    fetchIdeas();
+
+    return () => {
+      controller.abort();
+    };
+  }, [ideas, formData]);
+
   return (
-    <div>
-      LogoIdea
+    <div className='my-10'>
+      <HeadingDescription
+        title={Lookup.LogoIdeaTitle}
+        description={Lookup.LogoIdeaDesc}
+      />
+    <div className='flex items-center justify-center'>
+    {loading&&<Loader2Icon className='animate-spin my-10' />}
+    </div>
+    <div className='flex flex-wrap gap-3 mt-6'>
+      {ideas&&ideas.map((item,index)=>(
+        <h2 key={index}
+        onClick={()=>{setSelectedOption(item);
+          onHandleInputChange(item)
+        }}
+        className={`p-2 rounded-full border px-3 cursor-pointer
+          hover:border-primary ${selectedOption==item&&'border-primary'}`}
+        >{item}</h2>
+      ))}
+      <h2 
+       onClick={()=>{setSelectedOption('Let AI Select the best idea');
+        onHandleInputChange('Let AI Select the best idea')
+      }}
+      className={`p-2 rounded-full border px-3 cursor-pointer
+          hover:border-primary ${selectedOption=='Let AI Select the best idea'&&'border-primary'}`}>Let AI Select the best idea</h2>
+    </div>
     </div>
   )
 }
