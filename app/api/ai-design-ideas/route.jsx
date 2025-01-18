@@ -27,6 +27,13 @@ export async function POST(req) {
 
         try {
             const parsedData = JSON.parse(cleanText);
+            if (!parsedData.logo_ideas && parsedData.ideas) {
+                parsedData.logo_ideas = parsedData.ideas;
+                delete parsedData.ideas;
+            }
+            if (!parsedData.logo_ideas || !Array.isArray(parsedData.logo_ideas)) {
+                throw new Error('Invalid response format');
+            }
             return NextResponse.json(parsedData);
         } catch (error) {
             console.error('JSON parse error:', error);
