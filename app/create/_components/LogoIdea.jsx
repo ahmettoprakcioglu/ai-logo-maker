@@ -1,52 +1,18 @@
 import React, { useEffect, useRef, useState } from 'react'
 import HeadingDescription from './HeadingDescription'
 import Lookup from '@/app/_data/Lookup'
-import axios from 'axios'
-import Prompt from '../../_data/Prompt'
 import { Loader2Icon } from 'lucide-react'
 import { useLogoContext } from '@/app/_context/LogoContext'
 
 function LogoIdea({ formData, onHandleInputChange }) {
-  const { logoIdeas, updateLogoIdeas } = useLogoContext();
-  const [loading, setLoading] = useState(false);
+  const { logoIdeas, updateLogoIdeas, fetchLogoIdeas, loading } = useLogoContext();
   const [selectedOption, setSelectedOption] = useState(formData?.idea);
-  const requestInProgress = useRef(false);
 
   useEffect(() => {
     const controller = new AbortController();
-
-    const fetchIdeas = async () => {
-      if (!logoIdeas && !requestInProgress.current) {
-        try {
-          requestInProgress.current = true;
-          setLoading(true);
-          
-          const PROMPT = Prompt.DESIGN_IDEA_PROMPT
-            .replace('{logoType}', formData?.design?.title || '')
-            .replace('{logoTitle}', formData?.title || '')
-            .replace('{logoDesc}', formData?.desc || '')
-            .replace('{logoPrompt}', formData?.design?.prompt || '');
-
-          const result = await axios.post('/api/ai-design-ideas', 
-            { prompt: PROMPT }
-          );
-
-          if (result?.data?.logo_ideas) {
-            updateLogoIdeas(result.data.logo_ideas);
-          }
-        } catch (error) {
-          if (!axios.isCancel(error)) {
-            console.error('Error generating logo ideas:', error);
-          }
-        } finally {
-          setLoading(false);
-          requestInProgress.current = false;
-        }
-      }
-    };
     
     if (!formData?.idea) {
-      fetchIdeas();
+      fetchLogoIdeas(formData);
     }
 
     return () => {
