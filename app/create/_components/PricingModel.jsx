@@ -12,7 +12,7 @@ const PricingModel = () => {
         description={Lookup.LogoPricingModelDesc}
       />
 
-      <div className='grid grid-cols-1 md:grid-cols-2 gap-10'>
+      <div className='grid grid-cols-1 md:grid-cols-2 gap-10 mt-5'>
         {Lookup.pricingOption.map((pricing, index) => (
           <div className='flex flex-col items-center p-5 border rounded-xl gap-2' key={index}>
             <Image
