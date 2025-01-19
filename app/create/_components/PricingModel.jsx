@@ -1,10 +1,17 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import HeadingDescription from './HeadingDescription'
 import Lookup from '../../_data/Lookup'
 import Image from 'next/image'
 import { Button } from '@/components/ui/button'
+import { SignInButton, useUser } from '@clerk/nextjs'
 
-const PricingModel = () => {
+const PricingModel = ({ formData = {} }) => {
+  const { user } = useUser();
+  useEffect(() => {
+    if (typeof formData === 'object' && Object.keys(formData).length === 5 && typeof window !== 'undefined') {
+      localStorage.setItem('formData', JSON.stringify(formData))
+    }
+  }, [formData]);
   return (
     <div className='my-10'>
       <HeadingDescription
@@ -25,7 +32,13 @@ const PricingModel = () => {
                 <h2 key={index} className='text-lg mt-3'>{feature}</h2>
               ))}
             </div>
-            <Button className='mt-auto'>{pricing.button}</Button>
+            {user ? (
+              <Button className='mt-auto'>{pricing.button}</Button>
+            ) : (
+              <SignInButton mode='modal' forceRedirectUrl={`/generate-logo?type=${pricing.title}`}>
+                <Button className='mt-auto'>{pricing.button}</Button>
+              </SignInButton>
+            )}
           </div>
         ))}
       </div>
